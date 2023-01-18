@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import com.carp.forum.Exception.TokenException;
+import com.carp.forum.exception.TokenException;
 import com.carp.forum.tools.JwtTokenUtil;
 import com.carp.forum.tools.TokenSaver;
 
@@ -25,7 +25,7 @@ public class TokenInterceptor implements HandlerInterceptor {
 		
 		if(!request.getMethod().equals("OPTIONS")) {//on ne doit pas interception les req : OPTIONS
 			// todo: add allowed urls for unidentified user
-			if(!request.getRequestURI().equals("/login")
+			if(!request.getRequestURI().equals("/api/login")
 				&& !request.getRequestURI().equals("/reset-password")
 				&& !request.getRequestURI().equals("/change-password")
 					) {//ni les req /login
@@ -47,9 +47,6 @@ public class TokenInterceptor implements HandlerInterceptor {
 						|| !TokenSaver.tokensByEmail.get(email).equals(token)) {
 						throw new TokenException("Error : Unknown token !");
 				}
-				
-				
-
 				//Autre : ....
 				Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 				//TODO: allow specific URI for admin

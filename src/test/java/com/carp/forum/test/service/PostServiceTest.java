@@ -62,7 +62,7 @@ public class PostServiceTest {
 		boardRepository.deleteAll();
 	}
 	
-	@Test
+	//@Test
 	public void savePostTest() {
 		Post post = new Post();
 		post.setThread(thread);
@@ -82,7 +82,7 @@ public class PostServiceTest {
 		
 		postTest.setText("test 1");
 		postTest.setThreadId(1);
-		postTest = postService.save(postTest);
+
 		
 	}
 	

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.carp.forum.dto.UserDto;
+import com.carp.forum.exception.DuplicateEntryException;
 import com.carp.forum.service.IUserService;
 
 @RestController
@@ -20,7 +21,7 @@ public class UserController {
 	private IUserService userService;
 	
 	@PostMapping(consumes="application/json",produces = "application/json")
-	public ResponseEntity<UserDto> save(@RequestBody UserDto user){
+	public ResponseEntity<UserDto> save(@RequestBody UserDto user) throws DuplicateEntryException{
 		
 		UserDto result = userService.save(user);
 		

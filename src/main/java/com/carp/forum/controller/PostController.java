@@ -9,11 +9,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.carp.forum.dto.PostDto;
+import com.carp.forum.exception.EntityNotFoundException;
+import com.carp.forum.exception.ForbiddenActionException;
+import com.carp.forum.exception.InvalidUpdateException;
+import com.carp.forum.exception.TokenException;
 import com.carp.forum.service.IPostService;
 
 @RestController
@@ -24,7 +30,7 @@ public class PostController {
 	private IPostService postService;
 	
 	@PostMapping(consumes="application/json",produces = "application/json")
-	public ResponseEntity<PostDto> save(@RequestBody PostDto post){
+	public ResponseEntity<PostDto> save(@RequestBody PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException{
 		
 		PostDto result = postService.save(post);
 		
@@ -36,14 +42,31 @@ public class PostController {
 		PostDto result = postService.findById(id);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
+	
 	@DeleteMapping(produces="application/json",value="/{id}")
 	public ResponseEntity<Long> deleteById(@PathVariable("id")long id){
 		postService.deleteById(id);
 		return ResponseEntity.status(HttpStatus.OK).body(id);
 	}
-	@GetMapping(produces = "application/json")
-	public ResponseEntity<List<PostDto>> findAll(){
-		List<PostDto> result= postService.findAll(0, 0, null);
+	@GetMapping(produces = "application/json",value="/page")
+	public ResponseEntity<List<PostDto>> findPageByThreadId(@RequestParam("thread")long threadId,
+			@RequestParam(value="page",required=false,defaultValue="1")int page,
+			@RequestParam(value = "max",required = false,defaultValue = "20")int max){
+		List<PostDto> result= postService.findPageByThreadId(threadId, page, max);
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
+	
+	@PutMapping(consumes="application/json",produces = "application/json",value="/{id}")
+	public ResponseEntity<PostDto> update(@RequestBody PostDto post,@PathVariable("id")long id) throws InvalidUpdateException, TokenException, ForbiddenActionException, EntityNotFoundException{
+		if(post.getId()!=id) {
+			throw new InvalidUpdateException("param id in url must match param id in body");
+		}
+		PostDto result = postService.update(post);
+		if(result==null) {
+			result = postService.save(post);
+			return ResponseEntity.status(HttpStatus.CREATED).body(result);
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+	
 }

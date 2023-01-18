@@ -1,9 +1,13 @@
 package com.carp.forum.tools;
 
 import java.io.Serializable;
+import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
+
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,23 +15,29 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 
-
-@Component //au chargement de l'appli, un objet sera instancié et qu'on pourra injecté avec @Autowired
+@Component // au chargement de l'appli, un objet sera instancié et qu'on pourra injecté
+			// avec @Autowired
 public class JwtTokenUtil implements Serializable {
 
 	private static final long serialVersionUID = -2550185165626007488L;
 
 	// changer durée de validité du token
-	public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60; //1j
+	public static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60; // 1j
 
-	//on peut externaliser dans le fichier de properties si besoin
-	//@Value("${jwt.duration}") //dans application.properties : jwt.duration=86400
-	//private int jwtDurationToken;
-	
-	
+	// on peut externaliser dans le fichier de properties si besoin
+	// @Value("${jwt.duration}") //dans application.properties : jwt.duration=86400
+	// private int jwtDurationToken;
+
 	@Value("${jwt.secret}")
 	private String secret;
+
+	private static Key key;
+
+	public JwtTokenUtil() throws Exception {
+
+	}
 
 	public String getUsernameFromToken(String token) {
 		return getClaimFromToken(token, Claims::getSubject);
@@ -60,7 +70,7 @@ public class JwtTokenUtil implements Serializable {
 		return false;
 	}
 
-	public String doGenerateToken(Map<String, Object> claims, String subject) {
+	public String doGenerateToken(Map<String, Object> claims, String subject) throws Exception {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
@@ -70,5 +80,6 @@ public class JwtTokenUtil implements Serializable {
 	public Boolean canTokenBeRefreshed(String token) {
 		return (!isTokenExpired(token) || ignoreTokenExpiration(token));
 	}
+
 
 }

@@ -5,10 +5,13 @@ import java.util.Set;
 
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.entities.Post;
+import com.carp.forum.exception.EntityNotFoundException;
+import com.carp.forum.exception.ForbiddenActionException;
+import com.carp.forum.exception.TokenException;
 
 public interface IPostService {
 
-	PostDto save(PostDto post);
+	PostDto save(PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException;
 
 	PostDto findById(long id);
 
@@ -19,4 +22,8 @@ public interface IPostService {
 	PostDto update(PostDto post);
 
 	Set<Post> findMultiplePostsById(Set<Long> ids);
+
+	Set<Post> findMultiplePostsByIdAndByThreadId(Set<Long> ids, long threadId);
+
+	List<PostDto> findPageByThreadId(long threadId, int page, int max);
 }

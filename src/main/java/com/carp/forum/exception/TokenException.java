@@ -1,4 +1,4 @@
-package com.carp.forum.Exception;
+package com.carp.forum.exception;
 
 public class TokenException extends Exception {
 
