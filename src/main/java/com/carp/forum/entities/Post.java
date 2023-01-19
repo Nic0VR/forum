@@ -39,7 +39,7 @@ public class Post extends DbObject {
 	/**
 	 * Set contenant les posts qui répondent a ce post
 	 */
-	@ManyToMany//(fetch = FetchType.EAGER)
+	@ManyToMany
 	@JoinTable(name = "responses", joinColumns = @JoinColumn(name = "postId"),
 	inverseJoinColumns = @JoinColumn(name = "responseId"))
 	private Set<Post> repliedBy = new HashSet<Post>();

@@ -8,7 +8,7 @@ package com.carp.forum.exception;
 public class InvalidUpdateException extends Exception {
 
 	public InvalidUpdateException() {
-		super();
+		super("Mismatch in url and request body on param id");
 	
 	}
 

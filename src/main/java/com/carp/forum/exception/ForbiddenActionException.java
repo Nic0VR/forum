@@ -3,7 +3,7 @@ package com.carp.forum.exception;
 public class ForbiddenActionException extends Exception {
 
 	public ForbiddenActionException() {
-		super();
+		super("Unauthorized");
 	}
 
 	public ForbiddenActionException(String message) {

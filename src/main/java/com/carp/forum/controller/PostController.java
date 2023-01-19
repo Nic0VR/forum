@@ -37,25 +37,6 @@ public class PostController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}
 	
-	@GetMapping(produces = "application/json", value="/{id}")
-	public ResponseEntity<PostDto> findById(@PathVariable("id")long id){
-		PostDto result = postService.findById(id);
-		return ResponseEntity.status(HttpStatus.OK).body(result);
-	}
-	
-	@DeleteMapping(produces="application/json",value="/{id}")
-	public ResponseEntity<Long> deleteById(@PathVariable("id")long id){
-		postService.deleteById(id);
-		return ResponseEntity.status(HttpStatus.OK).body(id);
-	}
-	@GetMapping(produces = "application/json",value="/page")
-	public ResponseEntity<List<PostDto>> findPageByThreadId(@RequestParam("thread")long threadId,
-			@RequestParam(value="page",required=false,defaultValue="1")int page,
-			@RequestParam(value = "max",required = false,defaultValue = "20")int max){
-		List<PostDto> result= postService.findPageByThreadId(threadId, page, max);
-		return ResponseEntity.status(HttpStatus.OK).body(result);
-	}
-	
 	@PutMapping(consumes="application/json",produces = "application/json",value="/{id}")
 	public ResponseEntity<PostDto> update(@RequestBody PostDto post,@PathVariable("id")long id) throws InvalidUpdateException, TokenException, ForbiddenActionException, EntityNotFoundException{
 		if(post.getId()!=id) {
@@ -69,4 +50,32 @@ public class PostController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	
+	@GetMapping(produces = "application/json", value="/{id}")
+	public ResponseEntity<PostDto> findById(@PathVariable("id")long id){
+		PostDto result = postService.findById(id);
+		if(result==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+	
+	@DeleteMapping(produces="application/json",value="/{id}")
+	public ResponseEntity<Long> deleteById(@PathVariable("id")long id){
+		Long result = postService.deleteById(id);
+		if(result==null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id);
+		}
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(id);
+	}
+	
+	@GetMapping(produces = "application/json",value="/page")
+	public ResponseEntity<List<PostDto>> findPageByThreadId(
+			@RequestParam("thread")long threadId,
+			@RequestParam(value="page",required=false,defaultValue="1")int page,
+			@RequestParam(value = "max",required = false,defaultValue = "20")int max){
+		List<PostDto> result= postService.findPageByThreadId(threadId, page-1, max);
+		return ResponseEntity.status(HttpStatus.OK).body(result);
+	}
+	
+
 }

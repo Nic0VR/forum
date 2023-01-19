@@ -15,26 +15,42 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.carp.forum.dto.ApiErrorDto;
 import com.carp.forum.dto.ApiErrorDto.LogLevel;
 import com.carp.forum.exception.DuplicateEntryException;
+import com.carp.forum.exception.EntityNotFoundException;
+import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.InvalidUpdateException;
+import com.carp.forum.exception.TokenException;
 
 @ControllerAdvice
 public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyExceptionHandler.class);
-	
+	@ExceptionHandler(value= {TokenException.class})
 	protected ResponseEntity<?> handleTokenException(Exception ex, WebRequest request){
 		
 		ApiErrorDto error = new ApiErrorDto();
 		error.setErrorCode(401);
 		error.setMessage(ex.getMessage());
 		error.setPath(((ServletWebRequest)request).getRequest().getRequestURI());
-		error.setLevel(LogLevel.WARN);
+		error.setLevel(LogLevel.INFO);
 		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
 	
 		return handleExceptionInternal(ex, error, new HttpHeaders(), 
 				HttpStatus.UNAUTHORIZED, request);
 	}
 	
+	@ExceptionHandler(value= {ForbiddenActionException.class})
+	protected ResponseEntity<?> handleForbiddenActionException(Exception ex, WebRequest request){
+		
+		ApiErrorDto error = new ApiErrorDto();
+		error.setErrorCode(403);
+		error.setMessage(ex.getMessage());
+		error.setPath(((ServletWebRequest)request).getRequest().getRequestURI());
+		error.setLevel(LogLevel.INFO);
+		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
+	
+		return handleExceptionInternal(ex, error, new HttpHeaders(), 
+				HttpStatus.FORBIDDEN, request);
+	}
 	
 
 	@ExceptionHandler(value= {InvalidUpdateException.class})
@@ -48,7 +64,7 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
 	
 		return handleExceptionInternal(ex, error, new HttpHeaders(), 
-				HttpStatus.BAD_REQUEST, request);
+				HttpStatus.CONFLICT, request);
 	}
 	
 	@ExceptionHandler(value= {StaleObjectStateException.class})
@@ -62,11 +78,25 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
 	
 		return handleExceptionInternal(ex, error, new HttpHeaders(), 
-				HttpStatus.BAD_REQUEST, request);
+				HttpStatus.CONFLICT, request);
 	}
 	
 	@ExceptionHandler(value= {DuplicateEntryException.class})
 	protected ResponseEntity<?> handleDuplicateEntryException(Exception ex, WebRequest request){
+		
+		ApiErrorDto error = new ApiErrorDto();
+		error.setErrorCode(400);
+		error.setMessage(ex.getMessage());
+		error.setPath(((ServletWebRequest)request).getRequest().getRequestURI());
+		error.setLevel(LogLevel.INFO);
+		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
+	
+		return handleExceptionInternal(ex, error, new HttpHeaders(), 
+				HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@ExceptionHandler(value= {EntityNotFoundException.class})
+	protected ResponseEntity<?> handleEntityNotFound(Exception ex, WebRequest request){
 		
 		ApiErrorDto error = new ApiErrorDto();
 		error.setErrorCode(400);

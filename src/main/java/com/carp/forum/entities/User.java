@@ -11,10 +11,6 @@ import jakarta.persistence.Enumerated;
 @Entity
 public class User extends DbObject {
 
-	public User() {
-		
-	}
-
 	@Column(unique = true, nullable = false)
 	private String email;
 

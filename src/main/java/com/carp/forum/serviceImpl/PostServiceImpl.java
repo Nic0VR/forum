@@ -26,7 +26,7 @@ import com.carp.forum.tools.JwtTokenUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 
-//TODO : verif userId equals id in auth header jwt token
+
 @Service
 public class PostServiceImpl implements IPostService {
 	
@@ -39,14 +39,7 @@ public class PostServiceImpl implements IPostService {
 	@Autowired
 	private HttpServletRequest request;
 	
-	@Override
-	public Set<Post> findMultiplePostsById(Set<Long> ids){
-		
-		List<Post> resultInDb = postRepository.findAllById(ids);
-		Set<Post> result = Set.copyOf(resultInDb);
-		return result;
-	}
-	
+
 	@Override
 	public Set<Post> findMultiplePostsByIdAndByThreadId(Set<Long> ids, long threadId){
 		
@@ -59,7 +52,7 @@ public class PostServiceImpl implements IPostService {
 	public PostDto save(PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException {
 		Post entityToSave = DtoTools.convert(post, Post.class);
 		
-		if(post.getUserId()!=null) {
+		if(post.getUserId()!=null) { // check if userId is specified in the post
 			String headerAuth = request.getHeader("Authorization");
 			if(headerAuth == null) {
 				throw new TokenException("No Authorization header found but post contains userId");
@@ -68,14 +61,27 @@ public class PostServiceImpl implements IPostService {
 			Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 			long userId = claims.get("user_id", Long.class);
 			String userType = claims.get("user_type",String.class);
-			if(userId != post.getUserId() && userType!="ADMIN") {
-				throw new ForbiddenActionException();
+			if(userId != post.getUserId() && !userType.equals("ADMIN")) {
+				throw new ForbiddenActionException("Unauthorized");
 			}
 			Optional<User> optU = userRepository.findById(post.getUserId());
 			if (optU.isEmpty()) {
 				throw new EntityNotFoundException("User with id "+post.getUserId()+" not found");
 			}
 			entityToSave.setUser(optU.get());
+		}else { // try to assign post to logged user if user is logged
+			String headerAuth = request.getHeader("Authorization");
+			if(headerAuth != null) {
+				String token = headerAuth.substring(7);
+				Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
+				long userId = claims.get("user_id", Long.class);
+				Optional<User> optU = userRepository.findById(userId);
+				if(optU.isEmpty()) {
+					throw new EntityNotFoundException("User with id "+post.getUserId()+" not found");
+				}
+				entityToSave.setUser(optU.get());
+			}
+			
 		}
 		
 		// fetch replied posts, only if they are in the same thread
@@ -84,9 +90,10 @@ public class PostServiceImpl implements IPostService {
 		PostDto entitySaved = DtoTools.convert(entityToSave, PostDto.class);
 		return entitySaved;
 	}
+	
 	@Override
 	public List<PostDto> findPageByThreadId(long threadId,int page,int max){
-		List<Post> resultInDb = postRepository.findPageByThreadId(threadId, PageRequest.of(page-1, max)).get().collect(Collectors.toList());
+		List<Post> resultInDb = postRepository.findPageByThreadId(threadId, PageRequest.of(page, max)).get().collect(Collectors.toList());
 		List<PostDto> result = new ArrayList<>();
 		for (Post post : resultInDb) {
 			PostDto item = DtoTools.convert(post, PostDto.class);
@@ -106,13 +113,17 @@ public class PostServiceImpl implements IPostService {
 	}
 
 	@Override
-	public void deleteById(long id) {
-		postRepository.deleteById(id);
+	public Long deleteById(long id) {
+		if(postRepository.existsById(id)) {
+			postRepository.deleteById(id);
+			return id;
+		}
+		return null;
 	}
 
 	@Override
 	public List<PostDto> findAll(int page, int max, String search) {
-		List<Post> resultInDb = postRepository.findAll();
+		List<Post> resultInDb = postRepository.findAll(search,PageRequest.of(page, max)).get().collect(Collectors.toList());
 		List<PostDto> result = new ArrayList<>();
 		for (Post post : resultInDb) {
 			PostDto p = DtoTools.convert(post, PostDto.class);
@@ -122,12 +133,32 @@ public class PostServiceImpl implements IPostService {
 	}
 
 	@Override
-	public PostDto update(PostDto post) {
+	public PostDto update(PostDto post) throws EntityNotFoundException, TokenException, ForbiddenActionException {
 		Optional<Post> postInDb = postRepository.findById(post.getId());
 		
 		if(postInDb.isPresent()) {
 			Post postToSave = DtoTools.convert(post, Post.class);
 			postToSave.setReplyTo(this.findMultiplePostsByIdAndByThreadId(post.getReplyTo(),post.getThreadId()));
+			
+
+			if(post.getUserId()!=null) {
+				String headerAuth = request.getHeader("Authorization");
+				if(headerAuth == null) {
+					throw new TokenException("No Authorization header found but post contains userId");
+				}
+				String token = headerAuth.substring(7);
+				Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
+				long userId = claims.get("user_id", Long.class);
+				String userType = claims.get("user_type",String.class);
+				if(userId != post.getUserId() && !userType.equals("ADMIN")) {
+					throw new ForbiddenActionException();
+				}
+				Optional<User> optU = userRepository.findById(post.getUserId());
+				if (optU.isEmpty()) {
+					throw new EntityNotFoundException("User with id "+post.getUserId()+" not found");
+				}
+				postToSave.setUser(optU.get());
+			}
 			
 			postToSave = postRepository.saveAndFlush(postToSave);
 			return DtoTools.convert(postToSave, PostDto.class);

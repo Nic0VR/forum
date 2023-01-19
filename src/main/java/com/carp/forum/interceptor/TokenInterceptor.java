@@ -17,47 +17,45 @@ public class TokenInterceptor implements HandlerInterceptor {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-	
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		//System.out.println("inside token interceptor");
-		
-		if(!request.getMethod().equals("OPTIONS")) {//on ne doit pas interception les req : OPTIONS
-			// todo: add allowed urls for unidentified user
-			if(!request.getRequestURI().equals("/api/login")
-				&& !request.getRequestURI().equals("/reset-password")
-				&& !request.getRequestURI().equals("/change-password")
-					) {//ni les req /login
-				//récupérer l'entête Authorization (bearer TOKENNNNN)
+		// System.out.println("inside token interceptor");
+
+		if (!request.getMethod().equals("OPTIONS")) {// on ne doit pas interception les req : OPTIONS
+
+			if (!request.getRequestURI().equals("/api/login")
+			&&	!request.getRequestURI().equals("/api/user/create-account")	
+			&&  !(request.getRequestURI().equals("/api/post") && request.getMethod().equals("POST"))
+			&&  !request.getRequestURI().equals("/api/post/page")
+			
+					) {
+				// récupérer l'entête Authorization (bearer TOKENNNNN)
 				String headerAuth = request.getHeader("Authorization");
 				// si aucun jeton ou non conforme <7 => exception jeton absent ou non valide
-				if(headerAuth==null || headerAuth.trim().equals("") || headerAuth.length()<7)
+				if (headerAuth == null || headerAuth.trim().equals("") || headerAuth.length() < 7)
 					throw new TokenException("Error : Invalid token !");
-				
-				//	découpe pour extraire le jeton
+
+				// découpe pour extraire le jeton
 				String token = headerAuth.substring(7);
-				//	valider le jeton en vérifiant qu'il n'a pas expiré
-				if(jwtTokenUtil.isTokenExpired(token))
+				// valider le jeton en vérifiant qu'il n'a pas expiré
+				if (jwtTokenUtil.isTokenExpired(token))
 					throw new TokenException("Error : Expired token !");
-				
-				//vérifier que c'est un jeton qui a été stocké dans la map (TokenSaver)
+
+				// vérifier que c'est un jeton qui a été stocké dans la map (TokenSaver)
 				String email = jwtTokenUtil.getUsernameFromToken(token);
-				if(!TokenSaver.tokensByEmail.containsKey(email) 
+				if (!TokenSaver.tokensByEmail.containsKey(email)
 						|| !TokenSaver.tokensByEmail.get(email).equals(token)) {
-						throw new TokenException("Error : Unknown token !");
+					throw new TokenException("Error : Unknown token !");
 				}
-				//Autre : ....
+
 				Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
-				//TODO: allow specific URI for admin
+				// TODO: allow specific URI for admin
 			}
 		}
-		
-		
-		
-		
+
 		return true;
 	}
 
-	
 }

@@ -3,8 +3,10 @@ package com.carp.forum.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,4 +24,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 	
 	@Query("FROM Post p WHERE p.thread.id=:threadId")
 	Page<Post> findPageByThreadId(@Param("threadId")long threadId,Pageable pageable);
+	
+	@Query("FROM Post p WHERE p.text LIKE %:search%")
+	Page<Post> findAll(@Param("search")String search, PageRequest of);
 }

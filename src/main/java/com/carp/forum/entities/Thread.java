@@ -36,7 +36,10 @@ public class Thread extends DbObject {
 	 * Texte du thread
 	 */
 	private String text;
-
+	
+	@ManyToOne(targetEntity = User.class)
+	private User user;
+	
 	public void addPost(Post post) {
 		posts.add(post);
 		post.setThread(this);
@@ -77,6 +80,15 @@ public class Thread extends DbObject {
 
 	public void setBoard(Board board) {
 		this.board = board;
+	}
+
+	
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Override

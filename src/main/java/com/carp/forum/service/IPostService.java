@@ -15,13 +15,11 @@ public interface IPostService {
 
 	PostDto findById(long id);
 
-	void deleteById(long id);
+	Long deleteById(long id);
 
 	List<PostDto> findAll(int page, int max, String search);
 
-	PostDto update(PostDto post);
-
-	Set<Post> findMultiplePostsById(Set<Long> ids);
+	PostDto update(PostDto post) throws TokenException, ForbiddenActionException,EntityNotFoundException;
 
 	Set<Post> findMultiplePostsByIdAndByThreadId(Set<Long> ids, long threadId);
 
