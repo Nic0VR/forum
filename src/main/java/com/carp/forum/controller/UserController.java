@@ -48,7 +48,6 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.CREATED).body(result);
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
-
 	}
 
 	@GetMapping(value = "/{id}", produces = "application/json")
@@ -70,12 +69,15 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/page", produces = "application/json")
-	public ResponseEntity<List<UserDto>> findAll(
+	public ResponseEntity<List<UserDto>> findPage(
 			@RequestParam(value = "search", required = false, defaultValue = "") String search,
 			@RequestParam(value = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(value = "max", required = false, defaultValue = "20") int max) {
-
-		return ResponseEntity.status(HttpStatus.OK).body(userService.findAll(page - 1, max, search));
+		List<UserDto> result =userService.findAll(page - 1, max, search);
+		if(result.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 
 }

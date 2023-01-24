@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.entities.Post;
+import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.TokenException;

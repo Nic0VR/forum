@@ -36,13 +36,20 @@ public class ThreadController {
 	@GetMapping(produces = "application/json", value="/{id}")
 	public ResponseEntity<ThreadDto> findById(@PathVariable("id")long id){
 		ThreadDto result = threadService.findById(id);
+		if(result == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	
 	@DeleteMapping(produces = "application/json", value="/{id}")
 	public ResponseEntity<Long> deleteById(@PathVariable("id")long id){
-		threadService.deleteById(id);
-		return ResponseEntity.status(HttpStatus.OK).body(id);
+		
+		Long result = threadService.deleteById(id);
+		if(result == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(id);
 	}
 	
 	@GetMapping(produces = "application/json", value="/page")
@@ -52,6 +59,9 @@ public class ThreadController {
 			@RequestParam(value = "max",defaultValue = "20")int max){
 		
 		List<ThreadDto> result = threadService.findPageByBoardId(boardId, page-1, max, search);
+		if(result.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	

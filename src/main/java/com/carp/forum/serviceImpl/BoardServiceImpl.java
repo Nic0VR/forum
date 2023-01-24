@@ -1,9 +1,12 @@
 package com.carp.forum.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.carp.forum.dto.BoardDto;
@@ -37,14 +40,23 @@ public class BoardServiceImpl implements IBoardService {
 	}
 
 	@Override
-	public void deleteById(long id) {
-		boardRepository.deleteById(id);
+	public Long deleteById(long id) {
+		if(boardRepository.existsById(id)) {
+			boardRepository.deleteById(id);
+			return id;
+		}
+		return null;
 	}
 
 	@Override
 	public List<BoardDto> findAll(int page, int max, String search) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Board> resultInDb = boardRepository.findAll(search,PageRequest.of(page, max)).get().collect(Collectors.toList());
+		List<BoardDto> result = new ArrayList<BoardDto>();
+		for (Board board : resultInDb) {
+			BoardDto item = DtoTools.convert(board, BoardDto.class);
+			result.add(item);
+		}
+		return result;
 	}
 
 	@Override

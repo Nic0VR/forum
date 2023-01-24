@@ -1,7 +1,6 @@
 package com.carp.forum.serviceImpl;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -14,10 +13,12 @@ import org.springframework.stereotype.Service;
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.entities.Post;
 import com.carp.forum.entities.User;
+import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.TokenException;
 import com.carp.forum.repository.PostRepository;
+import com.carp.forum.repository.ThreadRepository;
 import com.carp.forum.repository.UserRepository;
 import com.carp.forum.service.IPostService;
 import com.carp.forum.tools.DtoTools;
@@ -38,7 +39,8 @@ public class PostServiceImpl implements IPostService {
 	private JwtTokenUtil jwtTokenUtil;
 	@Autowired
 	private HttpServletRequest request;
-	
+	@Autowired
+	private ThreadRepository threadRepository;
 
 	@Override
 	public Set<Post> findMultiplePostsByIdAndByThreadId(Set<Long> ids, long threadId){
@@ -51,6 +53,11 @@ public class PostServiceImpl implements IPostService {
 	@Override
 	public PostDto save(PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException {
 		Post entityToSave = DtoTools.convert(post, Post.class);
+		
+		//check if thread exists
+		if(!threadRepository.existsById(post.getThreadId()) ) {
+			throw new EntityNotFoundException("Thread not found");
+		}
 		
 		if(post.getUserId()!=null) { // check if userId is specified in the post
 			String headerAuth = request.getHeader("Authorization");
@@ -135,7 +142,9 @@ public class PostServiceImpl implements IPostService {
 	@Override
 	public PostDto update(PostDto post) throws EntityNotFoundException, TokenException, ForbiddenActionException {
 		Optional<Post> postInDb = postRepository.findById(post.getId());
-		
+		if(!threadRepository.existsById(post.getThreadId())) {
+			throw new EntityNotFoundException("Thread not found");
+		}
 		if(postInDb.isPresent()) {
 			Post postToSave = DtoTools.convert(post, Post.class);
 			postToSave.setReplyTo(this.findMultiplePostsByIdAndByThreadId(post.getReplyTo(),post.getThreadId()));

@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.carp.forum.dto.ApiErrorDto;
 import com.carp.forum.dto.ApiErrorDto.LogLevel;
+import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.DuplicateEntryException;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
@@ -95,6 +96,20 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 				HttpStatus.BAD_REQUEST, request);
 	}
 	
+	@ExceptionHandler(value= {BadPayloadException.class})
+	protected ResponseEntity<?> handleBadPayloadException(Exception ex, WebRequest request){
+		
+		ApiErrorDto error = new ApiErrorDto();
+		error.setErrorCode(400);
+		error.setMessage(ex.getMessage());
+		error.setPath(((ServletWebRequest)request).getRequest().getRequestURI());
+		error.setLevel(LogLevel.INFO);
+		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
+	
+		return handleExceptionInternal(ex, error, new HttpHeaders(), 
+				HttpStatus.BAD_REQUEST, request);
+	}
+	
 	@ExceptionHandler(value= {EntityNotFoundException.class})
 	protected ResponseEntity<?> handleEntityNotFound(Exception ex, WebRequest request){
 		
@@ -106,6 +121,6 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
 	
 		return handleExceptionInternal(ex, error, new HttpHeaders(), 
-				HttpStatus.BAD_REQUEST, request);
+				HttpStatus.NOT_FOUND, request);
 	}
 }

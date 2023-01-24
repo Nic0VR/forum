@@ -13,6 +13,8 @@ public class PostDto extends DbObject {
 	private Set<Long> replyTo = new HashSet<>();
 	private Set<Long> repliedBy = new HashSet<>();
 	private String text;
+	private String username;
+	
 	
 	public Long getUserId() {
 		return userId;
@@ -50,6 +52,12 @@ public class PostDto extends DbObject {
 	}
 	public void setText(String text) {
 		this.text = text;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	
 	

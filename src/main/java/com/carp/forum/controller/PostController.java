@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.carp.forum.dto.PostDto;
+import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.InvalidUpdateException;
@@ -30,7 +31,7 @@ public class PostController {
 	private IPostService postService;
 	
 	@PostMapping(consumes="application/json",produces = "application/json")
-	public ResponseEntity<PostDto> save(@RequestBody PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException{
+	public ResponseEntity<PostDto> save(@RequestBody PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
 		
 		PostDto result = postService.save(post);
 		
@@ -38,7 +39,7 @@ public class PostController {
 	}
 	
 	@PutMapping(consumes="application/json",produces = "application/json",value="/{id}")
-	public ResponseEntity<PostDto> update(@RequestBody PostDto post,@PathVariable("id")long id) throws InvalidUpdateException, TokenException, ForbiddenActionException, EntityNotFoundException{
+	public ResponseEntity<PostDto> update(@RequestBody PostDto post,@PathVariable("id")long id) throws InvalidUpdateException, TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
 		if(post.getId()!=id) {
 			throw new InvalidUpdateException("param id in url must match param id in body");
 		}
@@ -74,6 +75,9 @@ public class PostController {
 			@RequestParam(value="page",required=false,defaultValue="1")int page,
 			@RequestParam(value = "max",required = false,defaultValue = "20")int max){
 		List<PostDto> result= postService.findPageByThreadId(threadId, page-1, max);
+		if(result.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	

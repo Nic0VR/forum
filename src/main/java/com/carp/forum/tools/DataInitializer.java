@@ -51,7 +51,7 @@ public class DataInitializer implements ApplicationRunner {
 		if(boardRepository.count()==0 && threadRepository.count()==0 && postRepository.count()==0) {
 			Board board = new Board();
 			board.setTitle("test board");
-			board.setRef("/test/");
+			board.setRef("test");
 			board.setDescription("this is the test board");
 			board = boardRepository.save(board);
 			

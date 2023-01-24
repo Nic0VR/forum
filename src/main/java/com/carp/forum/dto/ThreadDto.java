@@ -8,6 +8,7 @@ public class ThreadDto extends DbObject{
 	private String text;
 	private long boardId;
 	private Long userId;
+	private String username;
 	
 	public String getTitle() {
 		return title;
@@ -32,6 +33,12 @@ public class ThreadDto extends DbObject{
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	

@@ -11,7 +11,7 @@ public interface IBoardService {
 
 	BoardDto findById(long id);
 
-	void deleteById(long id);
+	Long deleteById(long id);
 
 	List<BoardDto> findAll(int page, int max, String search);
 

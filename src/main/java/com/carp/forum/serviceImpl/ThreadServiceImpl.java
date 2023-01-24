@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.cfg.NotYetImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -99,13 +100,22 @@ public class ThreadServiceImpl implements IThreadService {
 
 	@Override
 	public List<ThreadDto> findAll(int page, int max, String search) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Thread> resultInDb = threadRepository.findPage(search, PageRequest.of(page, max)).get().collect(Collectors.toList());
+		List<ThreadDto> result = new ArrayList<>();
+		for (Thread thread : resultInDb) {
+			result.add(DtoTools.convert(thread, ThreadDto.class));
+			
+		}
+		return result;
 	}
 
 	@Override
 	public ThreadDto update(ThreadDto thread) {
-		// TODO Auto-generated method stub
+		Optional<Thread> threadInDb = threadRepository.findById(thread.getId());
+		if(threadInDb.isPresent()) {
+			Thread threadToSave = DtoTools.convert(thread, Thread.class);
+			//threadToSave.set
+		}
 		return null;
 	}
 

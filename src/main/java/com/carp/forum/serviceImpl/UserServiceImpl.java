@@ -163,8 +163,8 @@ public class UserServiceImpl implements IUserService {
 			claims.put("user_id", user.get().getId());
 			claims.put("user_username", user.get().getUsername());
 			claims.put("user_type", user.get().getRole().toString());
-			String token = jwtTokenUtil.doGenerateToken(claims, loginDto.getEmail());
-
+			String token = jwtTokenUtil.doGenerateToken(claims, user.get().getEmail());
+			
 			TokenSaver.tokensByEmail.put(user.get().getEmail(), token);
 			result.setId(user.get().getId());
 			result.setUsername(user.get().getUsername());
