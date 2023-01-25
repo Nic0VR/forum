@@ -1,5 +1,6 @@
 package com.carp.forum.controller;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.exception.BadPayloadException;
@@ -34,6 +37,17 @@ public class PostController {
 	public ResponseEntity<PostDto> save(@RequestBody PostDto post) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
 		
 		PostDto result = postService.save(post);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(result);
+	}
+	
+	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")
+	public ResponseEntity<PostDto> saveWithImage(@RequestPart PostDto post, @RequestPart(required = false) MultipartFile[] files) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
+		List<MultipartFile> fileList= Arrays.asList(files);
+		PostDto result = postService.saveWithImage(post,fileList);
+		
+		
+		
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}

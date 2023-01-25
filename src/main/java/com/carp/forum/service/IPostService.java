@@ -3,6 +3,8 @@ package com.carp.forum.service;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.entities.Post;
 import com.carp.forum.exception.BadPayloadException;
@@ -25,4 +27,8 @@ public interface IPostService {
 	Set<Post> findMultiplePostsByIdAndByThreadId(Set<Long> ids, long threadId);
 
 	List<PostDto> findPageByThreadId(long threadId, int page, int max);
+
+
+	PostDto saveWithImage(PostDto post, List<MultipartFile> files)
+			throws TokenException, ForbiddenActionException, EntityNotFoundException;
 }

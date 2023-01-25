@@ -1,6 +1,7 @@
 package com.carp.forum.dto;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.carp.forum.entities.DbObject;
@@ -16,7 +17,7 @@ public class PostDto extends DbObject {
 	private String username;
 	private String creationDate;
 	
-	
+	private List<String> files;
 	
 	public Long getUserId() {
 		return userId;
@@ -67,7 +68,18 @@ public class PostDto extends DbObject {
 	public void setCreationDate(String creationDate) {
 		this.creationDate = creationDate;
 	}
+	public List<String> getFiles() {
+		return files;
+	}
+	public void setFiles(List<String> files) {
+		this.files = files;
+	}
 	
-	
+	public void addFile(String file) {
+		this.files.add(file);
+	}
+	public void removeFile(String file) {
+		this.files.remove(file);
+	}
 	
 }
