@@ -14,6 +14,8 @@ public class PostDto extends DbObject {
 	private Set<Long> repliedBy = new HashSet<>();
 	private String text;
 	private String username;
+	private String creationDate;
+	
 	
 	
 	public Long getUserId() {
@@ -58,6 +60,12 @@ public class PostDto extends DbObject {
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public String getCreationDate() {
+		return creationDate;
+	}
+	public void setCreationDate(String creationDate) {
+		this.creationDate = creationDate;
 	}
 	
 	

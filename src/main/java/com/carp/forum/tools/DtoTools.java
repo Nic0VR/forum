@@ -21,7 +21,6 @@ public class DtoTools {
 
 	private static ModelMapper myMapper = new ModelMapper();
 	static Converter<Set<Post>, Set<Long>> postToLongConverter = src -> src.getSource().stream().map(p -> p.getId()).collect(Collectors.toCollection(HashSet::new));
-	//static Converter<Long,User> userToLongConverter = src -> src.getSource()==null ? null : new User()	;
 	public static <TSource, TDestination> TDestination convert(TSource obj, Class<TDestination> clazz) {
 
 		

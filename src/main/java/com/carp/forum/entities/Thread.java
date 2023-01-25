@@ -1,5 +1,7 @@
 package com.carp.forum.entities;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -37,9 +39,17 @@ public class Thread extends DbObject {
 	 */
 	private String text;
 	
+	private LocalDateTime creationDate;
+
+	
 	@ManyToOne(targetEntity = User.class)
 	private User user;
 	
+	public Thread() {
+		super();
+		this.setCreationDate(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)); 
+	}
+
 	public void addPost(Post post) {
 		posts.add(post);
 		post.setThread(this);
@@ -106,4 +116,14 @@ public class Thread extends DbObject {
 		return Objects.equals(board, other.board) && Objects.equals(title, other.title);
 	}
 
+	public LocalDateTime getCreationDate() {
+		return creationDate;
+	}
+
+	private void setCreationDate(LocalDateTime creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	
+	
 }

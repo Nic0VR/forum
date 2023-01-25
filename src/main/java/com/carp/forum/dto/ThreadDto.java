@@ -9,6 +9,7 @@ public class ThreadDto extends DbObject{
 	private long boardId;
 	private Long userId;
 	private String username;
+	private String creationDate;
 	
 	public String getTitle() {
 		return title;
@@ -39,6 +40,12 @@ public class ThreadDto extends DbObject{
 	}
 	public void setUsername(String username) {
 		this.username = username;
+	}
+	public String getCreationDate() {
+		return creationDate;
+	}
+	public void setCreationDate(String creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	
