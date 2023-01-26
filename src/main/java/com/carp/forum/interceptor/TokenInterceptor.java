@@ -29,6 +29,8 @@ public class TokenInterceptor implements HandlerInterceptor {
 			&&	!request.getRequestURI().equals("/api/user/create-account")	
 			&&  !(request.getRequestURI().equals("/api/post") && request.getMethod().equals("POST"))
 			&&  !request.getRequestURI().equals("/api/post/page")
+			&&  !request.getRequestURI().equals("/api/board/page")
+					
 			
 					) {
 				// récupérer l'entête Authorization (bearer TOKENNNNN)

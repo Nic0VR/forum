@@ -43,7 +43,7 @@ public class ThreadController {
 	
 	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")
 	public ResponseEntity<ThreadDto> saveWithImage(@RequestPart ThreadDto thread, @RequestPart(required = false) MultipartFile[] files) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
-		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.max(files.length-1, 2)); // take 3 files max
+		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.min(files.length, 2)); // take 3 files max
 		ThreadDto result = threadService.saveWithImage(thread,fileList);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);

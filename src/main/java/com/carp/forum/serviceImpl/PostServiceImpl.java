@@ -258,14 +258,16 @@ public class PostServiceImpl implements IPostService {
 		long userId = claims.get("user_id", Long.class);
 		String userType = claims.get("user_type", String.class);
 
-		if (!threadRepository.existsById(post.getThreadId())) {
-			throw new EntityNotFoundException("Thread not found");
-		}
+
 		if (postInDb.isPresent()) {
 
+			
 			if (!userType.equals("ADMIN")
 					&& (postInDb.get().getUser() == null || postInDb.get().getUser().getId() != userId ||  (post.getUserId()!=null && post.getUserId()!=userId))) {
 				throw new ForbiddenActionException();
+			}
+			if (!threadRepository.existsById(post.getThreadId())) {
+				throw new EntityNotFoundException("Thread not found");
 			}
 			Post postToSave = DtoTools.convert(post, Post.class);
 			postToSave.setReplyTo(this.findMultiplePostsByIdAndByThreadId(post.getReplyTo(), post.getThreadId()));

@@ -44,7 +44,7 @@ public class PostController {
 	
 	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")
 	public ResponseEntity<PostDto> saveWithImage(@RequestPart PostDto post, @RequestPart(required = false) MultipartFile[] files) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
-		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.max(files.length, 3));;
+		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.min(files.length, 3));;
 		PostDto result = postService.saveWithImage(post,fileList);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
