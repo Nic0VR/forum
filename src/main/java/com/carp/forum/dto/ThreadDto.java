@@ -1,5 +1,7 @@
 package com.carp.forum.dto;
 
+import java.util.List;
+
 import com.carp.forum.entities.DbObject;
 
 public class ThreadDto extends DbObject{
@@ -10,6 +12,8 @@ public class ThreadDto extends DbObject{
 	private Long userId;
 	private String username;
 	private String creationDate;
+	
+	private List<FileInfoDto> files;
 	
 	public String getTitle() {
 		return title;
@@ -46,6 +50,12 @@ public class ThreadDto extends DbObject{
 	}
 	public void setCreationDate(String creationDate) {
 		this.creationDate = creationDate;
+	}
+	public List<FileInfoDto> getFiles() {
+		return files;
+	}
+	public void setFiles(List<FileInfoDto> files) {
+		this.files = files;
 	}
 
 	

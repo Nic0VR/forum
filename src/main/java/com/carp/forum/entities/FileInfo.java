@@ -1,12 +1,15 @@
 package com.carp.forum.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 @Entity
 public class FileInfo extends DbObject{
-	@ManyToOne
+	@ManyToOne(optional = true)
 	private Post post;
+	@ManyToOne(optional = true)
+	private Thread thread;
 	@Column(unique = true)
 	private String fileName;
 	private String originalFileName;
@@ -42,6 +45,12 @@ public class FileInfo extends DbObject{
 	}
 	public void setOriginalFileName(String originalFileName) {
 		this.originalFileName = originalFileName;
+	}
+	public Thread getThread() {
+		return thread;
+	}
+	public void setThread(Thread thread) {
+		this.thread = thread;
 	}
 	
 

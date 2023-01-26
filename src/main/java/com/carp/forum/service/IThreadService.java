@@ -2,6 +2,8 @@ package com.carp.forum.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.carp.forum.dto.ThreadDto;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
@@ -18,5 +20,8 @@ public interface IThreadService {
 	
 	List<ThreadDto> findPageByBoardId(long boardId,int page,int max,String search);
 	
-	ThreadDto update(ThreadDto thread);
+	ThreadDto update(ThreadDto thread) throws TokenException, ForbiddenActionException, EntityNotFoundException;
+
+	ThreadDto saveWithImage(ThreadDto thread, List<MultipartFile> files)
+			throws TokenException, ForbiddenActionException, EntityNotFoundException;
 }

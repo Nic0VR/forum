@@ -1,5 +1,6 @@
 package com.carp.forum.serviceImpl;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.carp.forum.entities.FileInfo;
 import com.carp.forum.entities.Post;
+import com.carp.forum.entities.Thread;
 import com.carp.forum.exception.UnsupportedFileTypeException;
 import com.carp.forum.repository.FileInfoRepository;
 import com.carp.forum.service.FileService;
@@ -38,7 +40,7 @@ public class FileServiceImpl implements FileService {
 
 
 	@Override
-	public String saveFile(MultipartFile file, Post post) throws IOException, UnsupportedFileTypeException  {
+	public FileInfo saveFile(MultipartFile file, Post post) throws IOException, UnsupportedFileTypeException  {
 		if(!FileTools.isTypeAllowed(file.getContentType())) {
 			throw new UnsupportedFileTypeException("This file type is not supported");
 		}
@@ -48,27 +50,60 @@ public class FileServiceImpl implements FileService {
 		
 		String fileExtension = FileTools.getExtensionFromType( file.getContentType());
 		
-		String fileName = RandomStringUtils.random(12, true, true);
+		String fileName = RandomStringUtils.random(12, true, true)+fileExtension;
 		while(fileInfoRepository.existsByFileName(fileName)) {
 			fileName = RandomStringUtils.random(12, true, true);
 		}
 		
 		FileInfo fileInfo = new FileInfo();
-		Post p = new Post();
-		p.setId(post.getId());
-		fileInfo.setPost(p); // test if hibernate can do the mapping with just the post id
+
+
+		fileInfo.setPost(post);
 		fileInfo.setFileType(file.getContentType());
-		
-		
 		fileInfo.setFileName(fileName);
-		
+		fileInfo.setOriginalFileName(originalFileName);
+	
 		Path targetLocation = storagePath.resolve(fileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 		
-		fileInfoRepository.saveAndFlush(fileInfo);
+        fileInfo=fileInfoRepository.saveAndFlush(fileInfo);
         
-		return fileName;
+		return fileInfo;
 	}
+	
+	@Override
+	public Object saveFile(MultipartFile file, Thread entityToSave)
+			throws IOException, UnsupportedFileTypeException {
+		if(!FileTools.isTypeAllowed(file.getContentType())) {
+			throw new UnsupportedFileTypeException("This file type is not supported");
+		}
+		String saveLocation = storageFolder.trim();
+		Path storagePath = Paths.get(saveLocation).toAbsolutePath().normalize();
+		String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+		
+		String fileExtension = FileTools.getExtensionFromType( file.getContentType());
+		
+		String fileName = RandomStringUtils.random(12, true, true)+fileExtension;
+		while(fileInfoRepository.existsByFileName(fileName)) {
+			fileName = RandomStringUtils.random(12, true, true);
+		}
+		
+		FileInfo fileInfo = new FileInfo();
+
+
+		fileInfo.setThread(entityToSave);
+		fileInfo.setFileType(file.getContentType());
+		fileInfo.setFileName(fileName);
+		fileInfo.setOriginalFileName(originalFileName);
+	
+		Path targetLocation = storagePath.resolve(fileName);
+        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
+		
+        fileInfo=fileInfoRepository.saveAndFlush(fileInfo);
+        
+		return fileInfo;
+	}
+
 
 	@Override
 	public Resource loadFileAsResource(String fileName) throws FileNotFoundException, MalformedURLException{
@@ -83,5 +118,21 @@ public class FileServiceImpl implements FileService {
 			}
 
 	}
+	
+	public boolean delete(String filename) {
+		
+		try {
+			Path storagePath = Paths.get(storageFolder.trim()).toAbsolutePath();
+			Path filePath =storagePath.resolve(filename).normalize();
+			File file = new File(filePath.toUri());
+			file.delete();
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return false;
+		}
+	
+	}
+
 
 }

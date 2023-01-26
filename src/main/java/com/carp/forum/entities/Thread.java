@@ -120,7 +120,7 @@ public class Thread extends DbObject {
 		return creationDate;
 	}
 
-	private void setCreationDate(LocalDateTime creationDate) {
+	public void setCreationDate(LocalDateTime creationDate) {
 		this.creationDate = creationDate;
 	}
 

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.carp.forum.dto.LongDto;
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.EntityNotFoundException;
@@ -43,11 +44,8 @@ public class PostController {
 	
 	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")
 	public ResponseEntity<PostDto> saveWithImage(@RequestPart PostDto post, @RequestPart(required = false) MultipartFile[] files) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
-		List<MultipartFile> fileList= Arrays.asList(files);
+		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.max(files.length, 3));;
 		PostDto result = postService.saveWithImage(post,fileList);
-		
-		
-		
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
 	}
@@ -75,12 +73,12 @@ public class PostController {
 	}
 	
 	@DeleteMapping(produces="application/json",value="/{id}")
-	public ResponseEntity<Long> deleteById(@PathVariable("id")long id){
+	public ResponseEntity<LongDto> deleteById(@PathVariable("id")long id){
 		Long result = postService.deleteById(id);
 		if(result==null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new LongDto(id));
 		}
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new LongDto(id));
 	}
 	
 	@GetMapping(produces = "application/json",value="/page")

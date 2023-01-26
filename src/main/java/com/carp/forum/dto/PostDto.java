@@ -17,7 +17,7 @@ public class PostDto extends DbObject {
 	private String username;
 	private String creationDate;
 	
-	private List<String> files;
+	private List<FileInfoDto> files;
 	
 	public Long getUserId() {
 		return userId;
@@ -68,18 +68,13 @@ public class PostDto extends DbObject {
 	public void setCreationDate(String creationDate) {
 		this.creationDate = creationDate;
 	}
-	public List<String> getFiles() {
+	public List<FileInfoDto> getFiles() {
 		return files;
 	}
-	public void setFiles(List<String> files) {
+	public void setFiles(List<FileInfoDto> files) {
 		this.files = files;
 	}
+
 	
-	public void addFile(String file) {
-		this.files.add(file);
-	}
-	public void removeFile(String file) {
-		this.files.remove(file);
-	}
-	
+
 }

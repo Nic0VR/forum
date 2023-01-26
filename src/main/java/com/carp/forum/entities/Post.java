@@ -2,15 +2,17 @@ package com.carp.forum.entities;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
+import com.carp.forum.tools.StringListConverter;
+
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -44,6 +46,10 @@ public class Post extends DbObject {
 	inverseJoinColumns = @JoinColumn(name = "responseId"))
 	private Set<Post> repliedBy = new HashSet<Post>();
 
+//	@Convert(converter = StringListConverter.class )
+//	@Column()
+//	private List<String> filenames;
+	
 	public Post() {
 		super();
 		this.creationDate = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS);
