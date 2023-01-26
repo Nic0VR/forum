@@ -199,41 +199,47 @@ public class ThreadServiceImpl implements IThreadService {
 	@Override
 	public ThreadDto update(ThreadDto thread) throws TokenException, ForbiddenActionException, EntityNotFoundException {
 		String headerAuth = request.getHeader("Authorization");
-		if(headerAuth == null) {
+		if (headerAuth == null) {
 			throw new TokenException("No Authorization header");
 		}
 
 		String token = headerAuth.substring(7);
 		Claims claims = jwtTokenUtil.getAllClaimsFromToken(token);
 		long userId = claims.get("user_id", Long.class);
-		String userType = claims.get("user_type",String.class);
-		
+		String userType = claims.get("user_type", String.class);
+
 		Optional<Thread> threadInDb = threadRepository.findById(thread.getId());
 
-		
 		if (threadInDb.isPresent()) {
-			//check if user making update request on thread is the same whom created thread
-			if(userId != threadInDb.get().getUser().getId() && !userType.equals("ADMIN")) {
+			// check if user making update request on thread is the same whom created thread
+			if (!userType.equals("ADMIN")
+					&& (threadInDb.get().getUser() == null || threadInDb.get().getUser().getId() != userId  ||  (thread.getUserId()!=null && thread.getUserId()!=userId))) {
 				throw new ForbiddenActionException();
 			}
 			Thread threadToSave = DtoTools.convert(thread, Thread.class);
+
+			if (userType.equals("ADMIN")) {
+
+				if (thread.getUserId() != null) {
+					Optional<User> optU = userRepository.findById(thread.getUserId());
+					if (optU.isEmpty()) {
+						throw new EntityNotFoundException("User with id " + thread.getUserId() + " not found");
+					}
+					threadToSave.setUser(optU.get());
+				} else {
+					if (threadInDb.get().getUser() != null) {
+						threadToSave.setUser(threadInDb.get().getUser());
+					} else {
+						threadToSave.setUser(null);
+					}
+				}
+			} else {
 			
-			if(thread.getUserId()!=null ) {
-
-				if(userId != thread.getUserId() && !userType.equals("ADMIN")) {
-					throw new ForbiddenActionException();
-				}
-				Optional<User> optU = userRepository.findById(thread.getUserId());
-				if (optU.isEmpty()) {
-					throw new EntityNotFoundException("User with id "+thread.getUserId()+" not found");
-				}
-				threadToSave.setUser(optU.get());
-			}else {
-
 				threadToSave.setUser(threadInDb.get().getUser());
 			}
+			
+			
 			threadToSave.setCreationDate(threadInDb.get().getCreationDate());
-			//threadToSave.setPosts(threadInDb.get().getPosts());
 			threadToSave = threadRepository.saveAndFlush(threadToSave);
 			return DtoTools.convert(threadToSave, ThreadDto.class);
 		}

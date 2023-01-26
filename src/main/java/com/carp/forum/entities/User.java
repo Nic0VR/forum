@@ -23,6 +23,8 @@ public class User extends DbObject {
 
 	private String password;
 
+
+
 	public String getEmail() {
 		return email;
 	}

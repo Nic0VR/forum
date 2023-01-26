@@ -158,6 +158,10 @@ public class Post extends DbObject {
 				&& Objects.equals(thread, other.thread);
 	}
 
+	public void setCreationDate(LocalDateTime creationDate) {
+		this.creationDate = creationDate;
+	}
+
 
 	
 }
