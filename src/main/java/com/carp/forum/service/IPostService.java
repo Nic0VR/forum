@@ -28,7 +28,8 @@ public interface IPostService {
 
 	List<PostDto> findPageByThreadId(long threadId, int page, int max);
 
-
 	PostDto saveWithImage(PostDto post, List<MultipartFile> files)
 			throws TokenException, ForbiddenActionException, EntityNotFoundException;
+	
+	int countPostsByThreadId(long threadId);
 }

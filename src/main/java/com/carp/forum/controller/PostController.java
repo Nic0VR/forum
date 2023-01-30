@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.carp.forum.dto.CountDto;
 import com.carp.forum.dto.LongDto;
 import com.carp.forum.dto.PostDto;
 import com.carp.forum.exception.BadPayloadException;
@@ -40,6 +41,13 @@ public class PostController {
 		PostDto result = postService.save(post);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
+	}
+	
+	@GetMapping(value="/{threadId}/count",produces = "application/json")
+	public ResponseEntity<CountDto> countPostsByThreadId(@PathVariable("threadId")long threadId){
+		int result= postService.countPostsByThreadId(threadId);
+		return ResponseEntity.status(HttpStatus.OK).body(new CountDto(result));
+		
 	}
 	
 	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")

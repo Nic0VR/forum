@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -37,6 +38,7 @@ public class Thread extends DbObject {
 	/**
 	 * Texte du thread
 	 */
+	@Column(columnDefinition = "TEXT")
 	private String text;
 	
 	private LocalDateTime creationDate;

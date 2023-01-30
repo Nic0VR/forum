@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -74,8 +75,10 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public Object saveFile(MultipartFile file, Thread entityToSave)
 			throws IOException, UnsupportedFileTypeException {
-		if(!FileTools.isTypeAllowed(file.getContentType())) {
-			throw new UnsupportedFileTypeException("This file type is not supported");
+		Tika tika = new Tika();
+		String mimeType = tika.detect(file.getBytes());
+		if(!FileTools.isTypeAllowed(mimeType)) {
+			throw new UnsupportedFileTypeException("This file type is not supported: "+file.getContentType());
 		}
 		String saveLocation = storageFolder.trim();
 		Path storagePath = Paths.get(saveLocation).toAbsolutePath().normalize();

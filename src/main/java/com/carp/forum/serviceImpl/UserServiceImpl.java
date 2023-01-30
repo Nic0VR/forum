@@ -155,7 +155,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
 	@Override
-	public LoginResponseDto checkLogin(LoginDto loginDto) throws Exception {
+	public LoginResponseDto checkLogin(LoginDto loginDto) throws NoSuchAlgorithmException, UnsupportedEncodingException, TokenException {
 		Optional<User> user = userRepository.findByEmail(loginDto.getEmail());
 		if (user.isPresent() && user.get().getPassword().equals(HashTools.hashSHA512(loginDto.getPassword()))) {
 			LoginResponseDto result = DtoTools.convert(user, LoginResponseDto.class);
@@ -172,7 +172,7 @@ public class UserServiceImpl implements IUserService {
 			result.setTypeUser(user.get().getRole().toString());
 			return result;
 		} else {
-			throw new Exception("Erreur d'Authentification");
+			throw new TokenException("Erreur d'Authentification");
 		}
 	}
 }

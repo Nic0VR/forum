@@ -27,4 +27,7 @@ public interface PostRepository extends JpaRepository<Post,Long>{
 	
 	@Query("FROM Post p WHERE p.text LIKE %:search%")
 	Page<Post> findAll(@Param("search")String search, PageRequest of);
+	
+	@Query("SELECT COUNT(*) FROM Post p WHERE p.thread.id=:threadId")
+	int coutPostsByThreadId(@Param("threadId")long threadId);
 }

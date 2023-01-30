@@ -299,4 +299,9 @@ public class PostServiceImpl implements IPostService {
 		return null;
 	}
 
+	@Override
+	public int countPostsByThreadId(long threadId) {
+		return postRepository.coutPostsByThreadId(threadId);
+	}
+
 }

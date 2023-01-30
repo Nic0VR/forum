@@ -1,5 +1,7 @@
 package com.carp.forum.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import com.carp.forum.dto.LoginDto;
@@ -20,5 +22,5 @@ public interface IUserService {
 
 	UserDto update(UserDto user) throws TokenException, ForbiddenActionException, DuplicateEntryException;
 
-	LoginResponseDto checkLogin(LoginDto loginDto) throws Exception;
+	LoginResponseDto checkLogin(LoginDto loginDto) throws NoSuchAlgorithmException, UnsupportedEncodingException, TokenException ;
 }

@@ -55,16 +55,16 @@ public class DataInitializer implements ApplicationRunner {
 			board.setDescription("this is the test board");
 			board = boardRepository.save(board);
 			
-			Thread thread = new Thread();
-			thread.setBoard(board);
-			thread.setText("1st thread test");
-			thread.setTitle("test thread 1");
-			thread = threadRepository.save(thread);
-			
-			Post post1 = new Post();
-			post1.setThread(thread);
-			post1.setText("post 1");
-			post1 = postRepository.save(post1);
+//			Thread thread = new Thread();
+//			thread.setBoard(board);
+//			thread.setText("1st thread test");
+//			thread.setTitle("test thread 1");
+//			thread = threadRepository.save(thread);
+//			
+//			Post post1 = new Post();
+//			post1.setThread(thread);
+//			post1.setText("post 1");
+//			post1 = postRepository.save(post1);
 		}
 
 	}

@@ -18,20 +18,26 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.carp.forum.dto.CountDto;
 import com.carp.forum.dto.LongDto;
-import com.carp.forum.dto.PostDto;
 import com.carp.forum.dto.ThreadDto;
 import com.carp.forum.exception.BadPayloadException;
 import com.carp.forum.exception.EntityNotFoundException;
 import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.InvalidUpdateException;
 import com.carp.forum.exception.TokenException;
+import com.carp.forum.service.IPostService;
 import com.carp.forum.service.IThreadService;
 @RestController
 @RequestMapping("/api/thread")
 public class ThreadController {
 	@Autowired
 	private IThreadService threadService;
+	@Autowired
+	private IPostService postService;
+	
+
+	
 	
 	@PostMapping(consumes="application/json",produces = "application/json")
 	public ResponseEntity<ThreadDto> save(@RequestBody ThreadDto thread) throws TokenException, ForbiddenActionException, EntityNotFoundException{
@@ -43,7 +49,7 @@ public class ThreadController {
 	
 	@PostMapping(consumes="multipart/form-data",produces = "application/json",value = "/files")
 	public ResponseEntity<ThreadDto> saveWithImage(@RequestPart ThreadDto thread, @RequestPart(required = false) MultipartFile[] files) throws TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{
-		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.min(files.length, 2)); // take 3 files max
+		List<MultipartFile> fileList= Arrays.asList(files).subList(0, Math.min(files.length, 3)); // take 3 files max
 		ThreadDto result = threadService.saveWithImage(thread,fileList);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(result);
