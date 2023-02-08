@@ -33,7 +33,6 @@ public class JwtTokenUtil implements Serializable {
 	@Value("${jwt.secret}")
 	private String secret;
 
-	private static Key key;
 
 	public JwtTokenUtil() throws Exception {
 

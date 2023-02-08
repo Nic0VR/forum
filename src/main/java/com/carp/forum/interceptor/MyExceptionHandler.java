@@ -21,6 +21,8 @@ import com.carp.forum.exception.ForbiddenActionException;
 import com.carp.forum.exception.InvalidUpdateException;
 import com.carp.forum.exception.TokenException;
 
+import io.jsonwebtoken.ExpiredJwtException;
+
 @ControllerAdvice
 public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 
@@ -38,7 +40,19 @@ public class MyExceptionHandler extends ResponseEntityExceptionHandler  {
 		return handleExceptionInternal(ex, error, new HttpHeaders(), 
 				HttpStatus.UNAUTHORIZED, request);
 	}
+	@ExceptionHandler(value= {ExpiredJwtException.class})
+	protected ResponseEntity<?> handleExpiredJwtException(Exception ex, WebRequest request){
+		
+		ApiErrorDto error = new ApiErrorDto();
+		error.setErrorCode(401);
+		error.setMessage(ex.getMessage());
+		error.setPath(((ServletWebRequest)request).getRequest().getRequestURI());
+		error.setLevel(LogLevel.INFO);
+		LOGGER.error("Exception: "+ex.getClass()+" "+ex.getMessage()+" AT PATH :"+error.getPath());
 	
+		return handleExceptionInternal(ex, error, new HttpHeaders(), 
+				HttpStatus.UNAUTHORIZED, request);
+	}
 	@ExceptionHandler(value= {ForbiddenActionException.class})
 	protected ResponseEntity<?> handleForbiddenActionException(Exception ex, WebRequest request){
 		

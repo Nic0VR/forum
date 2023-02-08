@@ -5,7 +5,7 @@ public class FileInfoDto {
 	private String fileName;
 	private String originalFileName;
 	private String fileType;
-	
+	private String prefiewFileName;
 	
 	public String getFileName() {
 		return fileName;
@@ -24,6 +24,12 @@ public class FileInfoDto {
 	}
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
+	}
+	public String getPrefiewFileName() {
+		return prefiewFileName;
+	}
+	public void setPrefiewFileName(String prefiewFileName) {
+		this.prefiewFileName = prefiewFileName;
 	}
 	
 	

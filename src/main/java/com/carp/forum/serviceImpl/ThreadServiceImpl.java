@@ -265,4 +265,10 @@ public class ThreadServiceImpl implements IThreadService {
 		return result;
 	}
 
+	@Override
+	public int countThreadsByBoardId(long boardId) {
+		return threadRepository.countByBoardId(boardId);
+		
+	}
+
 }

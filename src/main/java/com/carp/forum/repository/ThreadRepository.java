@@ -16,5 +16,8 @@ public interface ThreadRepository extends JpaRepository<Thread,Long>{
 	
 	@Query("FROM Thread t WHERE t.title LIKE %:search% OR t.text LIKE %:search%")
 	Page<Thread> findPage(@Param("search")String search, Pageable pageable);
+	
+	@Query("SELECT COUNT(*) FROM Thread t WHERE t.board.id=:boardId")
+	int countByBoardId(@Param("boardId")long boardId);
 
 }

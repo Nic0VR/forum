@@ -24,4 +24,6 @@ public interface IThreadService {
 
 	ThreadDto saveWithImage(ThreadDto thread, List<MultipartFile> files)
 			throws TokenException, ForbiddenActionException, EntityNotFoundException;
+
+	int countThreadsByBoardId(long boardId);
 }

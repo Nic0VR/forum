@@ -12,6 +12,7 @@ public class FileInfo extends DbObject{
 	private Thread thread;
 	@Column(unique = true)
 	private String fileName;
+	private String prefiewFileName;
 	private String originalFileName;
 	private String fileSize;
 	private String fileType;
@@ -51,6 +52,12 @@ public class FileInfo extends DbObject{
 	}
 	public void setThread(Thread thread) {
 		this.thread = thread;
+	}
+	public String getPrefiewFileName() {
+		return prefiewFileName;
+	}
+	public void setPrefiewFileName(String prefiewFileName) {
+		this.prefiewFileName = prefiewFileName;
 	}
 	
 

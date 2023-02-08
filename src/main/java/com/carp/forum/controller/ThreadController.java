@@ -38,7 +38,6 @@ public class ThreadController {
 	
 
 	
-	
 	@PostMapping(consumes="application/json",produces = "application/json")
 	public ResponseEntity<ThreadDto> save(@RequestBody ThreadDto thread) throws TokenException, ForbiddenActionException, EntityNotFoundException{
 		
@@ -64,6 +63,13 @@ public class ThreadController {
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
 	
+	@GetMapping(produces = "application/json", value="/{boardId}/count")
+	public ResponseEntity<CountDto> countByBoardId(@PathVariable("boardId")long boardId){
+		int result= threadService.countThreadsByBoardId(boardId);
+		return ResponseEntity.status(HttpStatus.OK).body(new CountDto(result));
+		
+		
+	}
 	
 	
 	@DeleteMapping(produces = "application/json", value="/{id}")
@@ -80,7 +86,7 @@ public class ThreadController {
 	public ResponseEntity<List<ThreadDto>> findPageByBoardId(@RequestParam("board")long boardId,
 			@RequestParam(value="search",defaultValue="")String search,
 			@RequestParam(value="page",defaultValue = "1")int page, 
-			@RequestParam(value = "max",defaultValue = "20")int max){
+			@RequestParam(value = "max",defaultValue = "10")int max){
 		
 		List<ThreadDto> result = threadService.findPageByBoardId(boardId, page-1, max, search);
 		if(result.isEmpty()) {
@@ -88,6 +94,8 @@ public class ThreadController {
 		}
 		return ResponseEntity.status(HttpStatus.OK).body(result);
 	}
+	
+	
 	
 	@PutMapping(consumes="application/json",produces = "application/json",value="/{id}")
 	public ResponseEntity<ThreadDto> update(@RequestBody ThreadDto thread,@PathVariable("id")long id) throws InvalidUpdateException, TokenException, ForbiddenActionException, EntityNotFoundException, BadPayloadException{

@@ -1,5 +1,8 @@
 package com.carp.forum.serviceImpl;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tika.Tika;
@@ -42,9 +47,12 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public FileInfo saveFile(MultipartFile file, Post post) throws IOException, UnsupportedFileTypeException  {
-		if(!FileTools.isTypeAllowed(file.getContentType())) {
-			throw new UnsupportedFileTypeException("This file type is not supported");
+		Tika tika = new Tika();
+		String mimeType = tika.detect(file.getBytes());
+		if(!FileTools.isTypeAllowed(mimeType)) {
+			throw new UnsupportedFileTypeException("This file type is not supported: "+file.getContentType());
 		}
+
 		String saveLocation = storageFolder.trim();
 		Path storagePath = Paths.get(saveLocation).toAbsolutePath().normalize();
 		String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
@@ -55,18 +63,34 @@ public class FileServiceImpl implements FileService {
 		while(fileInfoRepository.existsByFileName(fileName)) {
 			fileName = RandomStringUtils.random(12, true, true);
 		}
+		String fileNamePreview = RandomStringUtils.random(12, true, true)+".png";
+		while(fileInfoRepository.existsByFileName(fileNamePreview)) {
+			fileNamePreview = RandomStringUtils.random(12, true, true)+".png";
+		}
 		
 		FileInfo fileInfo = new FileInfo();
-
-
+		BufferedImage originalImage = ImageIO.read(file.getInputStream());
+		int originalW = originalImage.getWidth();
+		int originalH = originalImage.getHeight();
+		double maxWidth=200;
+		double maxHeight=200;
+		double widthRatio = maxWidth / originalW;
+	    double heightRatio = maxHeight /originalH;
+	    double ratio = Math.min(widthRatio, heightRatio);
+	    int previewWidth= (int) Math.round(  ratio*originalW);
+	    int previewHeight= (int) Math.round(  ratio*originalH);
+		BufferedImage resizedImage = resizeImage(originalImage, previewWidth, previewHeight);
+		
 		fileInfo.setPost(post);
 		fileInfo.setFileType(file.getContentType());
 		fileInfo.setFileName(fileName);
 		fileInfo.setOriginalFileName(originalFileName);
-	
+		fileInfo.setPrefiewFileName(fileNamePreview);
 		Path targetLocation = storagePath.resolve(fileName);
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-		
+        File minifiedImageFile= new File("forum/"+fileNamePreview);
+
+        ImageIO.write(resizedImage,"png" , minifiedImageFile);
         fileInfo=fileInfoRepository.saveAndFlush(fileInfo);
         
 		return fileInfo;
@@ -88,20 +112,38 @@ public class FileServiceImpl implements FileService {
 		
 		String fileName = RandomStringUtils.random(12, true, true)+fileExtension;
 		while(fileInfoRepository.existsByFileName(fileName)) {
-			fileName = RandomStringUtils.random(12, true, true);
+			fileName = RandomStringUtils.random(12, true, true)+fileExtension;
 		}
-		
+		String fileNamePreview = RandomStringUtils.random(12, true, true)+".png";
+		while(fileInfoRepository.existsByFileName(fileNamePreview)) {
+			fileNamePreview = RandomStringUtils.random(12, true, true)+".png";
+		}
+		//TODO : clean this 
 		FileInfo fileInfo = new FileInfo();
-
+		BufferedImage originalImage = ImageIO.read(file.getInputStream());
+		int originalW = originalImage.getWidth();
+		int originalH = originalImage.getHeight();
+		double maxWidth=200;
+		double maxHeight=200;
+		double widthRatio = maxWidth / originalW;
+	    double heightRatio = maxHeight /originalH;
+	    double ratio = Math.min(widthRatio, heightRatio);
+	    int previewWidth= (int) Math.round(  ratio*originalW);
+	    int previewHeight= (int) Math.round(  ratio*originalH);
+		BufferedImage resizedImage = resizeImage(originalImage, previewWidth, previewHeight);
+		
 
 		fileInfo.setThread(entityToSave);
 		fileInfo.setFileType(file.getContentType());
 		fileInfo.setFileName(fileName);
 		fileInfo.setOriginalFileName(originalFileName);
-	
+		fileInfo.setPrefiewFileName(fileNamePreview);
 		Path targetLocation = storagePath.resolve(fileName);
+
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-		
+        File minifiedImageFile= new File("forum/"+fileNamePreview);
+
+        ImageIO.write(resizedImage,"png" , minifiedImageFile);
         fileInfo=fileInfoRepository.saveAndFlush(fileInfo);
         
 		return fileInfo;
@@ -136,6 +178,12 @@ public class FileServiceImpl implements FileService {
 		}
 	
 	}
-
+	
+	BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+	    Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+	    BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	    outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+	    return outputImage;
+	}
 
 }
